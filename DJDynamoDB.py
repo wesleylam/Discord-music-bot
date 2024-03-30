@@ -29,7 +29,8 @@ class DJDB():
         if SongAttr.SongVol in item:
             item[SongAttr.SongVol] = item[SongAttr.SongVol] / 100 # Scale down from percentage
         for attr in SongAttr.get_all():
-            setattr(song, attr, item[attr])
+            if attr in item:
+                setattr(song, attr, item[attr])
         return song
             
 
@@ -38,6 +39,11 @@ class DJDB():
     def db_get(self, vID, get_attrs = None) -> SongInfo:
         # get        
         if get_attrs:
+            #### Need vid, title and channelid to create songinfo obj
+            ### TODO: refactor to not require this
+            if SongAttr.vID not in get_attrs: get_attrs.append(SongAttr.vID)
+            if SongAttr.Title not in get_attrs: get_attrs.append(SongAttr.Title)
+            if SongAttr.ChannelID not in get_attrs: get_attrs.append(SongAttr.ChannelID)
             response = self.table.get_item( 
                 Key={ 'vID': vID }, 
                 AttributesToGet = get_attrs 
@@ -477,4 +483,8 @@ class DJDB():
 
 
 if __name__ == "__main__":
+    ## TESTING Connection
+    a = DJDB()
+    a.connect()
+    a.db_get("", [SongAttr.Duration])
     pass

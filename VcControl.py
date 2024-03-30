@@ -6,6 +6,7 @@ from SongManager import SongManager
 from const.options import ffmpeg_error_log, default_init_vol, leaving_gif_search_list
 from const.helper import *
 from const.SongInfo import SongInfo
+from exceptions import DJExceptions
 import SourceCompile
 from API.ytAPIget import *
 import random
@@ -156,7 +157,10 @@ class VcControl():
                 (yt_link, options, suggested) = self.djReadied
                 # Do not play dj recommendation if just skipped
                 if not (suggested and just_skipped): 
-                    self.getServerControl().play(yt_link, **options)
+                    try: 
+                        self.getServerControl().play(yt_link, **options)
+                    except DJExceptions.DJBannedException:
+                        pass
                 self.djReadied = None
                 
             # currently playing
