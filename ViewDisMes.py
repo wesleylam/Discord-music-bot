@@ -11,7 +11,7 @@ class PlayBox(discord.ui.View):
         self.vID = vID
         
     async def on_timeout(self):
-        super().on_timeout()
+        await super().on_timeout()
         
     def setVID(self, vID):
         if vID != self.vID:

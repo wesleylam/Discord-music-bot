@@ -265,7 +265,8 @@ class DJDB():
 
     def find_duration(self, vID) -> int:
         try: 
-            return self.db_get(vID, [SongAttr.Duration])[SongAttr.Duration]
+            returned_song = self.db_get(vID, [SongAttr.Duration])
+            return returned_song[SongAttr.Duration]
         except DJDBException as e:
             return -1
 

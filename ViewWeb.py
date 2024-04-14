@@ -16,6 +16,9 @@ class ViewWeb(ViewBase):
     
     def playingUpdated(self):
         self.playing_updated = True
+        
+    def checkDisplay(self):
+        pass
     
     def songInfoUpdated(self):
         self.song_info_updated = True

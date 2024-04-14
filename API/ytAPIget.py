@@ -6,6 +6,8 @@ from const.DBFields import SongAttr
 from const.helper import *
 
 def get_yt_suggestions(vID, force_music = True):
+    return None
+    # TODO: YT KILLED SUGGESTIONS
     categoryID_get = f"&videoCategoryId={10}"
     url = f"https://youtube.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId={vID}&type=video&key={yt_API_key}"
     if force_music: url += categoryID_get
@@ -90,6 +92,10 @@ def yt_search_suggestions(vID) -> list[SongInfo]:
     response = get_yt_suggestions(vID)
 
     songs = []
+    if response is None or 'items' not in response:
+        print(f"items not in yt suggest res: {response}")
+        return []
+        
     items = response['items']
     for i in range(len(items)):
         item = items[i]

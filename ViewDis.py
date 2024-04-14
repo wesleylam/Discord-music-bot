@@ -79,8 +79,12 @@ class ViewDis(ViewBase):
     
     def playingUpdated(self):
         self.playing_updated = True
-        
         asyncio.ensure_future(self.updatePlaybox(), loop=self.loop)
+        
+    def checkDisplay(self):
+        if self.playbox_message == None:
+            print("ViewDis: No playbox found, forcing update")
+            playingUpdated()
         
     def suggestionUpdated(self):
         self.playingUpdated()

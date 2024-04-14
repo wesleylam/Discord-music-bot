@@ -108,6 +108,13 @@ class ServerControl():
             ServersHub.ServersHub.djdb.update_duration(vID, time.time() - self.counting_start_time)
         self.viewsList.playingUpdated()
         
+    def display_nowplaying(self, ):
+        ## udpate view playbox
+        self.viewsList.playingUpdated()
+        
+    def verifyDisplay(self):
+        self.viewsList.checkDisplay()
+        
     def suggestionUpdated(self):
         self.viewsList.suggestionUpdated()
     
@@ -153,6 +160,11 @@ class ViewsList():
         print("PLAYING UPDATED")
         for v in self.views:
             v.playingUpdated()
+        pass
+    
+    def checkDisplay(self):
+        for v in self.views:
+            v.checkDisplay()
         pass
     
     def suggestionUpdated(self):

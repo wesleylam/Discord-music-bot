@@ -145,6 +145,10 @@ class VcControl():
             
         ##### CURRENTLY PLAYING, OR NOTHING PLAYING BUT NOTHING IN QUEUE
         else:
+            ## CHECK FOR CURRENT VIEW (just for ViewDis, due to inconsistency)
+            if self.playingSong is not None:
+                self.getServerControl().verifyDisplay()
+            
             # PREPARE SOMETHING FOR THE NEXT SONG (RANDOM SONG)
             if self.dj and self.djReadied == None and len(self.songManager.getPlaylist()) == 0:
                 self.djReadied = self.djExec()
