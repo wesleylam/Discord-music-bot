@@ -44,15 +44,18 @@ class DJCog(commands.Cog):
 # -------------------------------------------------------------------------------------------- # 
 # ------------------------------------- VOICE CONTROL ---------------------------------------- # 
     # -------------------------------------------------------------------------------------------- # 
-    @commands.command(aliases=['patch', 'note'])
-    async def patchnote(self, ctx):
+    def makePatchnoteEmbedded(self):
         '''Show the newest patch note'''
         # get gif
         q = random.choice(opening_gif_search_list)
         gif = get_tenor_gif(q)
         # make embed
-        embeded = Views.patch_note_box(gif)
-        await ctx.send( embed = embeded)
+        return Views.patch_note_box(gif)
+        
+    @commands.command(aliases=['patch', 'note'])
+    async def patchnote(self, ctx):
+        '''Show the newest patch note'''
+        await ctx.send( embed = self.makePatchnoteEmbedded())
 
     # -------------------- Join voice channel -------------------- #
     @commands.command()
@@ -89,8 +92,8 @@ class DJCog(commands.Cog):
             await vc.connect()
             if not silence:
                 # show patch note
-                await self.patchnote(message_channel)
-                await self.notify(message_channel, f'DJ2.0 is here! http://weslam.ddns.net:42069/{guild.id}', None)
+                await message_channel.send( embed = self.makePatchnoteEmbedded() )
+                await self.notify(message_channel, f'DJ2.0 is here! http://weslam.ddns.net:9000/server/{guild.id}', None)
                 
             # create new control instance, send current channel for further messaging
             self.Hub.add(
@@ -111,6 +114,8 @@ class DJCog(commands.Cog):
             guild_id = ctx.guild.id
         if ctx.voice_client is None:
             raise Exception("I am not in any voice channel, use join command instead")
+        elif self.Hub.getControl(guild_id) == None:
+            ctx.voice_client.disconnect()
         else: 
             self.Hub.getControl(guild_id).disconnect()
             
@@ -203,13 +208,13 @@ class DJCog(commands.Cog):
     @commands.command(aliases = ['np', 'now'])
     async def nowplaying(self, ctx):
         '''Redisplay nowplaying board w/ controls'''
-        await self.Hub.getControl(ctx.guild.id).display_nowplaying()
+        self.Hub.getControl(ctx.guild.id).display_nowplaying()
 
     # COMMAND: queue
     @commands.command(aliases=['playlist'])
     async def queue(self, ctx):
         '''List current playlist queue'''
-        await self.Hub.getControl(ctx.guild.id).list(ctx)
+        await self.notify(ctx, f"Current queue: {self.Hub.getControl(ctx.guild.id).getQueue()}")
 
     # COMMAND: skip
     @commands.command()
