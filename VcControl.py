@@ -11,6 +11,7 @@ import SourceCompile
 from API.ytAPIget import *
 import random
 import ServersHub
+import time
 
 from API.ytAPIget import yt_search_suggestions
 
@@ -81,6 +82,7 @@ class VcControl():
     # --------------------------------------------------------------------------- # 
     def startPlayLoop(self):
         '''Add exec loop to current asyncio loop'''
+        print("VcControl: Starting new play loop")
         self.asyncLoop.create_task(self.execLoop())
 
     async def execLoop(self):
@@ -90,15 +92,26 @@ class VcControl():
             return 
         
         self.started = True
-        try:
-            while(self.vc is not None):
+        self.djReadied = None
+        
+        last_playing = time.time()
+        while(self.vc is not None):
+            ## log last playing, force quit if not playing over 60 secs
+            if self.vc.is_playing():
+                last_playing = time.time()
+            if time.time() - last_playing > 60:
+                print("SEVERE: NOT PLAYING OVER 60 sec, FORCE QUITING EXECTION LOOP")
+                break
+                
+            try:
                 self.exec()
                 await asyncio.sleep(1)
-        except Exception as e:
-            error_log_e(e)
+            except Exception as e:
+                self.getServerControl().clear()
+                self.djReadied = None
+                error_log_e(e)
             
-        print("Exec Loop ended")
-        
+        print("Exec Loop ended", self.vc)        
         self.started = False
 
     def exec(self):
@@ -123,13 +136,14 @@ class VcControl():
                 return
             
         ##### NOTHING IS PLAYING, AND SOMETHING IS IN QUEUE, then play queued song
-        if self.playingSong is None and len(self.songManager.getPlaylist()) > 0:
+        if self.playingSong is None and (len(self.songManager.getPlaylist()) > 0):
             
             # Get next queued song and PLAY
             source, songInfo, player = self.songManager.next()
             # songInfo.player = player # DO NOT INCLUDE PLAYER IN SONG INFO
             self.playingSong = songInfo
             self.playingInfo = (songInfo, player)
+            print("sending source to vc", songInfo)
             self.vc.play(source)
             
             # RESET DJ SUGGESTION
@@ -290,7 +304,8 @@ class VcControl():
         self.songManager.clear()
 
     def stop(self):
-        self.vc.stop()
+        if self.vc:
+            self.vc.stop()
         self.playingInfo = None
         self.playingSong = None
         # clear all queue?? 

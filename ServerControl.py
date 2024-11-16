@@ -17,6 +17,8 @@ class ServerControl():
         self.guild = guild
         self.vcControl = VcControl.VcControl(g_id, g_name, vc, loop)
         self.viewsList: ViewsList = ViewsList()
+        self.counting_song = ""
+        self.counting_start_time = time.time()
         self.addView(ViewWeb())
         self.addView(ViewDis(g_id, message_channel, loop))
         
@@ -96,7 +98,7 @@ class ServerControl():
     
                 
     # ----------------------------- RECEIVE UPDATE ------------------------------ # 
-    def songStarted(self, vID: str):        
+    def songStarted(self, vID: str):
         self.counting_song = vID
         self.counting_start_time = time.time()
         # NEED TO ENSURE IT IS QUEUED BY PLAYER TO ADD TO QCOUNT

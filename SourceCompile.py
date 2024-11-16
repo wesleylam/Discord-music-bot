@@ -119,7 +119,16 @@ def scp_compile(vid, vol, loud = False, stream = True, baseboost = False):
                 # take first item from a playlist
                 data = data['entries'][0]
 
-            filename = data['requested_formats'][1]['url'] if stream else ydl.prepare_filename(data)
+            
+            if stream:
+                if 'requested_formats' in data:
+                    filename = data['requested_formats'][1]['url']  
+                elif 'url' in data:
+                    filename = data['url']
+                else:
+                    print("ERROR: NO URL OR REQUESTED FORMAT")
+            else: 
+                filename = ydl.prepare_filename(data)
             ## TODO: USE Extracted info for entry data (eg: duration, title, channel)
             
     except DownloadError as e: # youtube dl download error
